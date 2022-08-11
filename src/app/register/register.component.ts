@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { subscribeOn } from 'rxjs';
 import { DataService } from '../services/data.service';
 
 @Component({
@@ -9,11 +11,18 @@ import { DataService } from '../services/data.service';
 })
 export class RegisterComponent implements OnInit {
 
-  uname=''
-  acno=''
-  pswd=''
+  uname = ''
+  acno = ''
+  pswd = ''
 
-  constructor(private ds:DataService, private router:Router) { }
+  //register model
+  registerForm = this.fb.group({
+    uname: ['', [Validators.required, Validators.pattern('[a-zA-Z]*')]],
+    acno: ['', [Validators.required, Validators.pattern('[0-9]*')]],
+    pswd: ['', [Validators.required, Validators.pattern('[a-zA-Z0-9]*')]]
+  })
+
+  constructor(private ds: DataService, private router: Router, private fb: FormBuilder) { }
 
   ngOnInit(): void {
   }
@@ -21,20 +30,29 @@ export class RegisterComponent implements OnInit {
 
 
   register(){
-    var uname=this.uname
-    var acno=this.acno
-    var pswd=this.pswd
-//call register in data service
+    
+    var uname=this.registerForm.value.uname
+    var acno=this.registerForm.value.acno
+    var pswd=this.registerForm.value.pswd
 
-const result = this.ds.register(acno,pswd,uname)
-if(result){
-  alert("Successfully register")
-  this.router.navigateByUrl("")
-}
-else{
-  alert("user already exist...Please Login")
-  this.router.navigateByUrl("")
-}
-
+    if(this.registerForm.valid){
+      //call register in data service - asynchronous
+    const result = this.ds.register(acno,pswd,uname)
+    .subscribe((result:any)=>{
+      if(result){
+        alert(result.message)
+        this.router.navigateByUrl("")
+      }
+    },
+    result=>{
+      alert(result.error.message)
+      this.router.navigateByUrl("")
+    }
+    )
+    }
+    else{           
+       alert('Invalid Form')
+    }
+    
   }
 }
