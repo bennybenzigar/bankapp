@@ -7,7 +7,7 @@
    </nav>
    
 <!-- delete confirm child -->
-<app-delete-confirm (click)="cancel()" [item]="acno"></app-delete-confirm>
+<app-delete-confirm (onDelete)="onDelete($event)" (click)="cancel()" [item]="acno"></app-delete-confirm>
 
 
    <!-- Deposit Form -->

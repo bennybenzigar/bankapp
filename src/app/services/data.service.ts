@@ -11,70 +11,16 @@ const options = {
 })
 export class DataService {
 
-  //user name
-  CurrentUser: any
-  // type:any
-
-  currentAcno:any
+ 
 
 
-
-  // data base
-  userDetails: any = {
-    1000: { acno: 1000, username: 'Neer', password: 1000, balance: 5000,transaction:[]},
-    1001: { acno: 1001, username: 'Laisha', password: 1001, balance: 6000,transaction:[] },
-    1002: { acno: 1002, username: 'Vyom', password: 1002, balance: 4000,transaction:[] }
-  }
 
 
   constructor( private http: HttpClient) {
-    this.getDetails()
+   
   }
 
-  //to store data in local storage
-  saveDetails(){
-
-    //database
-
-    if(this.userDetails){
-      localStorage.setItem('userDetails',JSON.stringify(this.userDetails))
-    }
-//login username
-    if(this.CurrentUser){
-      localStorage.setItem('CurrentUser',JSON.stringify(this.CurrentUser))
-    }
-//login acno
-    if(this.currentAcno){
-      localStorage.setItem('currentAcno',JSON.stringify(this.currentAcno))
-    }
-  }
-
-//to store data from local storage
-  getDetails(){
-    //database
-
-    if(localStorage.getItem('userDetails')){
-      this.userDetails=JSON.parse(localStorage.getItem('userDetails')||'')
-
-    }
-
-//login user
-    if(localStorage.getItem('CurrentUser')){
-      this.CurrentUser=JSON.parse(localStorage.getItem('CurrentUser')||'')
-
-    }
-
-
-
-    //login acno
-
-    //login user
-    if(localStorage.getItem('currentAcno')){
-      this.currentAcno=JSON.parse(localStorage.getItem('currentAcno')||'')
-
-    }
-  }
-
+  
 
   //register
   register(acno: any, password: any, username: any) {
@@ -133,39 +79,31 @@ const token =JSON.parse(localStorage.getItem('token')||'')
 
   //withdraw
   withdraw(acno: any, pswd: any, amt: any) {
-    let userDetails = this.userDetails
-    var amount = parseInt(amt)
-    if (acno in userDetails) {
-      if (pswd == userDetails[acno]['password']) {
-        if( userDetails[acno]['balance']>amount){
-          userDetails[acno]['balance'] -= amount
-          userDetails[acno]['transaction'].push({
-            type:"DEBIT",
-            amount
-          })
-          console.log(userDetails)
-          this.saveDetails()
-        return userDetails[acno]['balance']
-        }
-        else{alert("Insufficient balance")
-      return false}
-        
-      }
-      else {
-        alert('Incorrect Password')
-        return false
-      }
+      //req body
+   const data={
+    acno,pswd,amt
+   }
+   //login api -asynchronous
 
-    }
-    else {
-      alert('User Does not Exist')
-      return false
-    }
+   return this.http.post('http://localhost:3000/withdraw',data,this.getOptions())
+   
   }
 
 
   //transaction
   getTransaction(acno:any){
-    return this.userDetails[acno]['transaction']
-  }
+     //req body
+   const data={
+    acno
+   }
+   //login api -asynchronous
+
+   return this.http.post('http://localhost:3000/transaction',data,this.getOptions())
+   
+}
+
+//deleteAPI
+delete(acno:any){
+ return this.http.delete('http://localhost:3000/onDelete/'+acno)
+}
 }

@@ -47,19 +47,23 @@ export class DashboardComponent implements OnInit {
 
 
   constructor(private ds: DataService, private fb: FormBuilder, private router: Router) {
+   
+    if(!localStorage.getItem('CurrentUser')){
+       //fetch username from local storage
     this.user = JSON.parse(localStorage.getItem('CurrentUser') || '')
+  }
     this.lDate = new Date()
   }
 
   ngOnInit(): void {
 
 
-    // if(!localStorage.getItem('currentAcno')){
+    if(!localStorage.getItem('token')){
 
-    //   alert('Please login')
+      alert('Please login')
 
-    //   this.router.navigateByUrl('')
-    // }
+      this.router.navigateByUrl('')
+    }
   }
 
   //Deposit
@@ -89,24 +93,29 @@ export class DashboardComponent implements OnInit {
   }
 
 
-  //WithDraw
-  withdraw() {
-    var acno = this.withdrawForm.value.acno1
-    var pswd = this.withdrawForm.value.pswd1
-    var amount = this.withdrawForm.value.amount1
+  //WithDrawl
+  withdraw(){
 
+    var acno1 = this.withdrawForm.value.acno1
+    var pswd1 = this.withdrawForm.value.pswd1
+    var amount1 = this.withdrawForm.value.amount1
 
-    const result = this.ds.withdraw(acno, pswd, amount)
-
-    if (this.withdrawForm.valid) {
-      if (result) {
-        alert(`${amount} Debited Success Fully And New Balance Is ${result} `)
-      }
-
+    if(this.withdrawForm.valid){
+      const result =this.ds.withdraw(acno1,pswd1,amount1)
+      .subscribe(
+        (result:any)=>{
+          alert(result.message)
+        },
+        result=>{
+          alert(result.error.message)
+        }
+      )   
     }
-    else {
-      alert("Invaild Withdraw Form")
+
+    else{
+      alert('Invalid Form')
     }
+    
   }
 
 
@@ -117,7 +126,8 @@ export class DashboardComponent implements OnInit {
 
     localStorage.removeItem('currentAcno')
     localStorage.removeItem('CurrentUser')
-
+    localStorage.removeItem('token')
+//navigate to url
     this.router.navigateByUrl('')
 
   }
@@ -133,5 +143,21 @@ export class DashboardComponent implements OnInit {
   cancel() {
 
     this.acno = ""
+  }
+
+  //onDelete($event)
+  onDelete(event:any){
+    //asynchronous
+    this.ds.delete(event)
+    .subscribe(
+      (result:any)=>{
+        alert(result.message)
+this.logout()
+
+      },
+      result=>{
+        alert(result.error.message)
+      }
+    )
   }
 }
